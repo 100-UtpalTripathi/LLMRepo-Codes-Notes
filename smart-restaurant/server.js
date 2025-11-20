@@ -63,7 +63,20 @@ const getMenuTool = new DynamicStructuredTool({
 });
 
 
+// Step 3: Define Prompt Template, which guides the agent's behavior
+const prompt = ChatPromptTemplate.fromMessages([
+  ["system", "You are a helpful restaurant assistant that uses tools when needed!"],
+  ["human", "{input}"],
+  ["ai", "{agent_scratchpad}"],
+]);
 
+
+// Step 4: Create the agent with the language model, tools, and prompt
+const agent = await createToolCallingAgent({
+  llm: model,              // The Gemini AI model we initialized earlier
+  tools: [getMenuTool],    // Array of tools the agent can use
+  prompt: prompt           // The prompt template that guides agent behavior
+});
 
 
 
