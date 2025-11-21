@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant Chatbot</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      max-width: 700px; 
+      margin: 2rem auto; 
+      padding: 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    
+    h2 {
+      color: #667eea;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-size: 2rem;
+    }
+    
+    #chat { 
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 1.5rem;
+      min-height: 400px;
+      max-height: 500px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    
+    #chat:empty:before {
+      content: "Start chatting by asking about our menu! 😊";
+      color: #999;
+      font-style: italic;
+    }
+    
+    .input-container {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    input { 
+      flex: 1;
+      padding: 1rem; 
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus {
+      border-color: #667eea;
+    }
+    
+    button { 
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .message {
+      margin-bottom: 1rem;
+      padding: 0.5rem 0;
+    }
+    
+    .user-message {
+      color: #667eea;
+      font-weight: 600;
+    }
+    
+    .bot-message {
+      color: #333;
+      margin-left: 1rem;
+    }
+    
+    .loading {
+      color: #999;
+      font-style: italic;
+    }
+    
+    .error {
+      color: #e74c3c;
+      background: #ffeef0;
+      padding: 1rem;
+      border-radius: 5px;
+      margin: 0.5rem 0;
+    }
+
+    /* Scrollbar styling */
+    #chat::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    #chat::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    #chat::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🍽️ Restaurant AI Assistant</h2>
+    <div id="chat"></div>
+    <div class="input-container">
+      <input 
+        type="text" 
+        id="userInput" 
+        placeholder="Ask me: What's on the dinner menu?" 
+        onkeypress="handleKeyPress(event)"
+      />
+      <button onclick="sendMessage()" id="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const chatDiv = document.getElementById("chat");
+    const userInput = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function handleKeyPress(event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    }
+
+    function addMessage(role, text, isError = false) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = "message";
+      
+      if (isError) {
+        messageDiv.className += " error";
+        messageDiv.textContent = `❌ ${text}`;
+      } else if (role === "user") {
+        messageDiv.innerHTML = `<span class="user-message">👤 You:</span> ${text}`;
+      } else {
+        messageDiv.innerHTML = `<span class="bot-message">🤖 Bot:</span> ${text}`;
+      }
+      
+      chatDiv.appendChild(messageDiv);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const input = userInput.value.trim();
+      
+      if (!input) {
+        return;
+      }
+
+      // Disable input while processing
+      userInput.disabled = true;
+      sendBtn.disabled = true;
+      
+      // Add user message
+      addMessage("user", input);
+      userInput.value = "";
+
+      // Show loading indicator
+      const loadingDiv = document.createElement("div");
+      loadingDiv.className = "message loading";
+      loadingDiv.textContent = "🤖 Bot is thinking...";
+      chatDiv.appendChild(loadingDiv);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input })
+        });
+
+        // Remove loading indicator
+        chatDiv.removeChild(loadingDiv);
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Server error");
+        }
+
+        const data = await res.json();
+        addMessage("bot", data.output);
+        
+      } catch (error) {
+        // Remove loading indicator
+        if (chatDiv.contains(loadingDiv)) {
+          chatDiv.removeChild(loadingDiv);
+        }
+        addMessage("", `Error: ${error.message}`, true);
+      } finally {
+        // Re-enable input
+        userInput.disabled = false;
+        sendBtn.disabled = false;
+        userInput.focus();
+      }
+    }
+
+    // Focus input on load
+    window.onload = () => {
+      userInput.focus();
+    };
+  </script>
+</body>
+</html>
