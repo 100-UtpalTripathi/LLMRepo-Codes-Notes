@@ -1,0 +1,77 @@
+<svg viewBox="0 0 800 1000" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="400" y="40" font-size="28" font-weight="bold" text-anchor="middle" fill="#1e293b">
+    Agent Architecture
+  </text>
+  
+  <!-- Step 1: AI Model -->
+  <rect x="250" y="80" width="300" height="80" rx="10" fill="#fbbf24" stroke="#f59e0b" stroke-width="3"/>
+  <text x="400" y="110" font-size="18" font-weight="bold" text-anchor="middle" fill="#1e3a8a">Step 1: AI Model</text>
+  <text x="400" y="135" font-size="14" text-anchor="middle" fill="#1e3a8a">ChatGoogleGenerativeAI</text>
+  <text x="400" y="152" font-size="12" text-anchor="middle" fill="#1e3a8a">gemini-2.5-flash</text>
+  
+  <!-- Arrow -->
+  <path d="M 400 160 L 400 190" stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Step 2: Tool Definition -->
+  <rect x="250" y="200" width="300" height="100" rx="10" fill="#60a5fa" stroke="#3b82f6" stroke-width="3"/>
+  <text x="400" y="230" font-size="18" font-weight="bold" text-anchor="middle" fill="white">Step 2: Define Tool</text>
+  <text x="400" y="250" font-size="13" text-anchor="middle" fill="white">DynamicStructuredTool</text>
+  <text x="400" y="270" font-size="11" text-anchor="middle" fill="white">name: "getMenu"</text>
+  <text x="400" y="285" font-size="11" text-anchor="middle" fill="white">func: returns menu data</text>
+  
+  <!-- Arrow -->
+  <path d="M 400 300 L 400 330" stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Step 3: Bind Tools -->
+  <rect x="200" y="340" width="400" height="80" rx="10" fill="#a78bfa" stroke="#8b5cf6" stroke-width="3"/>
+  <text x="400" y="370" font-size="18" font-weight="bold" text-anchor="middle" fill="white">Step 3: Bind Tools to Model</text>
+  <text x="400" y="395" font-size="14" text-anchor="middle" fill="white">modelWithTools = model.bindTools([getMenuTool])</text>
+  <text x="400" y="412" font-size="11" text-anchor="middle" fill="white">🔗 AI now knows about available tools</text>
+  
+  <!-- Arrow -->
+  <path d="M 400 420 L 400 450" stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Step 4: Tool Executor -->
+  <rect x="250" y="460" width="300" height="80" rx="10" fill="#34d399" stroke="#10b981" stroke-width="3"/>
+  <text x="400" y="490" font-size="18" font-weight="bold" text-anchor="middle" fill="white">Step 4: Tool Executor</text>
+  <text x="400" y="512" font-size="13" text-anchor="middle" fill="white">processToolCalls()</text>
+  <text x="400" y="530" font-size="11" text-anchor="middle" fill="white">Runs tools when AI requests them</text>
+  
+  <!-- Arrow -->
+  <path d="M 400 540 L 400 570" stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Step 5: Agent Loop -->
+  <rect x="100" y="580" width="600" height="380" rx="10" fill="#f87171" stroke="#dc2626" stroke-width="3"/>
+  <text x="400" y="610" font-size="18" font-weight="bold" text-anchor="middle" fill="white">Step 5: Agent Loop (ReAct Pattern)</text>
+  
+  <!-- User Input -->
+  <rect x="150" y="630" width="500" height="50" rx="8" fill="white" stroke="#dc2626" stroke-width="2"/>
+  <text x="400" y="660" font-size="13" text-anchor="middle" fill="#1e293b">👤 User: "What's for breakfast?"</text>
+  
+  <!-- First AI Call -->
+  <rect x="150" y="700" width="500" height="60" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="400" y="725" font-size="12" font-weight="bold" text-anchor="middle" fill="#1e293b">🤖 First AI Call (Planning)</text>
+  <text x="400" y="745" font-size="11" text-anchor="middle" fill="#1e293b">AI: "I need menu data, use getMenu(breakfast)"</text>
+  
+  <!-- Tool Execution -->
+  <rect x="150" y="780" width="500" height="60" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+  <text x="400" y="805" font-size="12" font-weight="bold" text-anchor="middle" fill="#1e293b">🔧 Execute Tool</text>
+  <text x="400" y="825" font-size="11" text-anchor="middle" fill="#1e293b">getMenu("breakfast") → "Upma, Poha, Noodles..."</text>
+  
+  <!-- Second AI Call -->
+  <rect x="150" y="860" width="500" height="60" rx="8" fill="#ddd6fe" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="400" y="885" font-size="12" font-weight="bold" text-anchor="middle" fill="#1e293b">🤖 Second AI Call (Response)</text>
+  <text x="400" y="905" font-size="11" text-anchor="middle" fill="#1e293b">AI crafts answer using tool results</text>
+  
+  <!-- Final Output -->
+  <rect x="150" y="935" width="500" height="50" rx="8" fill="white" stroke="#dc2626" stroke-width="2"/>
+  <text x="400" y="965" font-size="13" text-anchor="middle" fill="#1e293b">✅ "For breakfast, we have Upma, Poha..."</text>
+  
+  <!-- Arrow marker definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#64748b"/>
+    </marker>
+  </defs>
+</svg>
